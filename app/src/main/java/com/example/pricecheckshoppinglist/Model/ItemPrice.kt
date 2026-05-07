@@ -1,4 +1,6 @@
-package com.example.pricecheckshoppinglist.ui.theme
+package com.example.pricecheckshoppinglist.Model
+
+import com.example.pricecheckshoppinglist.Model.Store
 
 data class ItemPrice(
     val store: Store,

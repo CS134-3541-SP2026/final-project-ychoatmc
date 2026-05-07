@@ -9,8 +9,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.pricecheckshoppinglist.ui.theme.Store
-import com.example.pricecheckshoppinglist.ui.theme.StoreViewModel
+import com.example.pricecheckshoppinglist.Model.Store
+import com.example.pricecheckshoppinglist.ViewModel.StoreViewModel
 
 @Composable
 fun MainStoreView(

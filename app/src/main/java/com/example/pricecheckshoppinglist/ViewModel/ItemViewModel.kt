@@ -1,6 +1,8 @@
-package com.example.pricecheckshoppinglist.ui.theme
+package com.example.pricecheckshoppinglist.ViewModel
 
 import androidx.lifecycle.ViewModel
+import com.example.pricecheckshoppinglist.Model.Item
+import com.example.pricecheckshoppinglist.Model.Store
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
