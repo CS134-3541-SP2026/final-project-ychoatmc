@@ -30,6 +30,7 @@ import com.example.pricecheckshoppinglist.Views.ChooseStoreEditView
 import com.example.pricecheckshoppinglist.Views.EditItemView
 import com.example.pricecheckshoppinglist.Views.ListView
 import com.example.pricecheckshoppinglist.Views.StoreEditView
+import java.text.DecimalFormatSymbols
 
 
 class MainActivity : ComponentActivity() {
@@ -48,6 +49,53 @@ object Destinations{
     val STORE_EDIT_SCREEN = "store_edit_screen"
     val LIST_SCREEN = "list_screen"
     val EDIT_ITEM_SCREEN = "edit_item_screen"
+}
+
+class DecimalFormatter(
+    symbols: DecimalFormatSymbols = DecimalFormatSymbols.getInstance()
+){
+    private val decimalSeparator = symbols.decimalSeparator
+
+    fun cleanup(input: String) : String {
+        if (input.matches("\\D".toRegex())) return ""
+        if (input.matches("0+".toRegex())) return "0"
+
+        val sb = StringBuilder()
+
+        var leadingDigits = 0
+        var endingDigits = 0
+        var hasDecimalSep = false
+        var invalidEntry = false
+
+        for (char in input){
+            if (char.isDigit()){
+                if(!hasDecimalSep && !invalidEntry) {
+                    if (leadingDigits < 2) {
+                        sb.append(char)
+                        leadingDigits += 1
+                    }
+                    else{
+                        invalidEntry = true
+                    }
+                }
+                else{
+                    if(endingDigits < 2){
+                        sb.append(char)
+                        endingDigits += 1
+                    }
+                }
+                continue
+            }
+            if (char == decimalSeparator && !hasDecimalSep && sb.isEmpty()){
+                sb.append(char)
+                hasDecimalSep = true
+            }
+        }
+
+        if(invalidEntry)
+            return "Invalid Entry"
+        return sb.toString()
+    }
 }
 
 @PreviewScreenSizes
@@ -74,7 +122,8 @@ fun PriceCheckShoppingApp() {
         composable (route = Destinations.STORE_EDIT_SCREEN) {
             StoreEditView(modifier = Modifier,
                 onBackClick = {shoppingListNavController.popBackStack()},
-                onMainPageClick = {shoppingListNavController.navigate(Destinations.HOME_SCREEN)})
+                onMainPageClick = {shoppingListNavController.navigate(Destinations.HOME_SCREEN)},
+                decimalFormatter = {DecimalFormatter().cleanup(String())})
         }
         composable (route = Destinations.LIST_SCREEN){
             ListView(modifier = Modifier,
@@ -84,7 +133,8 @@ fun PriceCheckShoppingApp() {
         composable (route = Destinations.EDIT_ITEM_SCREEN){
             EditItemView(modifier = Modifier,
                 onBackClick = {shoppingListNavController.popBackStack()},
-                onMainPageClick = {shoppingListNavController.navigate(Destinations.HOME_SCREEN)})
+                onMainPageClick = {shoppingListNavController.navigate(Destinations.HOME_SCREEN)},
+                decimalFormatter = { DecimalFormatter().cleanup(String())})
         }
     }
     /**
