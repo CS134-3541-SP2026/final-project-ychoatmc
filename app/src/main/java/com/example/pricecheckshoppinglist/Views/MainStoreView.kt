@@ -9,13 +9,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.pricecheckshoppinglist.Model.Store
 import com.example.pricecheckshoppinglist.ViewModel.StoreViewModel
 
 @Composable
-fun MainStoreView(
-    viewModel: StoreViewModel,
-    modifier: Modifier
+fun MainStoreView(modifier: Modifier, onStoreEditClick: () -> Unit, onListClick: () -> Unit
 ){
     Column(
         modifier = modifier
@@ -24,5 +21,7 @@ fun MainStoreView(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text("Smarter Shopping App")
+        Button(onClick = onStoreEditClick) {Text("Add/Edit Store") }
+        Button(onClick = onListClick) {Text("Temporary Store One") }
     }
 }
