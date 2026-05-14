@@ -42,10 +42,18 @@ object Destinations {
     val HOME_SCREEN = "home_screen"
     val STORE_SCREEN = "store_screen"
     val STORE_EDIT_SCREEN = "store_edit_screen/{storeName}"
-    val LIST_SCREEN = "list_screen"
-    val EDIT_ITEM_SCREEN = "edit_item_screen"
+    val LIST_SCREEN = "list_screen/{storeName}"
+    val EDIT_ITEM_SCREEN = "edit_item_screen/{itemName}"
     fun editStoreScreen(storeName: String): String {
         return "store_edit_screen/$storeName"
+    }
+
+    fun storesListScreen(storeName: String): String{
+        return "list_screen/$storeName"
+    }
+
+    fun itemEditScreen(itemName: String): String{
+        return "edit_item_screen/$itemName"
     }
 }
 
@@ -64,7 +72,9 @@ fun PriceCheckShoppingApp() {
         composable(route = Destinations.HOME_SCREEN){
             HomeScreen(modifier = Modifier,
                 onStoreEditClick = {shoppingListNavController.navigate(Destinations.STORE_SCREEN)},
-                onListClick = {shoppingListNavController.navigate(route = Destinations.LIST_SCREEN)},
+                onListClick = {
+                    storeName ->
+                    shoppingListNavController.navigate(route = Destinations.storesListScreen(storeName))},
                 viewModel = homeViewModel)
         }
         composable (route = Destinations.STORE_SCREEN){
@@ -91,16 +101,32 @@ fun PriceCheckShoppingApp() {
                 editStore = storeName
             )
         }
-        composable (route = Destinations.LIST_SCREEN){
+        composable (route = Destinations.LIST_SCREEN,
+            arguments = listOf(navArgument("storeName"){
+                type = NavType.StringType
+            })){
+            backStackEntry ->
+            val storeName = backStackEntry.arguments?.getString("storeName")
+                ?: return@composable
             ListScreen(modifier = Modifier,
                 viewModel = itemViewModel,
                 onBackClick = {shoppingListNavController.popBackStack()},
-                onEditItemPageClick = {shoppingListNavController.navigate(Destinations.EDIT_ITEM_SCREEN)})
+                onEditItemPageClick = {
+                    itemName ->
+                    shoppingListNavController.navigate(Destinations.itemEditScreen(itemName))},
+                storeName = storeName)
         }
-        composable (route = Destinations.EDIT_ITEM_SCREEN){
+        composable (route = Destinations.EDIT_ITEM_SCREEN,
+            arguments = listOf(navArgument("itemName"){
+                type = NavType.StringType
+            })){
+            backStackEntry ->
+            val itemName = backStackEntry.arguments?.getString("itemName")
+                ?: return@composable
             EditItemScreen(modifier = Modifier,
                 onBackClick = {shoppingListNavController.popBackStack()},
                 viewModel = itemViewModel,
+                editItem = itemName,
                 onMainPageClick = {shoppingListNavController.navigate(Destinations.HOME_SCREEN)}
             )
         }

@@ -20,7 +20,7 @@ import com.example.pricecheckshoppinglist.viewModels.StoreViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(modifier: Modifier, onStoreEditClick: () -> Unit, onListClick: () -> Unit,
+fun HomeScreen(modifier: Modifier, onStoreEditClick: () -> Unit, onListClick: (String) -> Unit,
                   viewModel: StoreViewModel
 ){
     Column(
@@ -40,7 +40,7 @@ fun HomeScreen(modifier: Modifier, onStoreEditClick: () -> Unit, onListClick: ()
             horizontalAlignment = Alignment.CenterHorizontally) {
             if (viewModel.storeCount() != 0) {
                 viewModel.stores.collectAsState().value.forEach {
-                    Button(onListClick) {
+                    Button({ onListClick(it.name) }) {
                         Text(it.name)
                     }
                 }
