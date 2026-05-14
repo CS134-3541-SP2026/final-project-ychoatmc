@@ -21,7 +21,7 @@ fun ChooseStoreScreen(
     viewModel: StoreViewModel,
     modifier: Modifier,
     onBackClick: () -> Unit,
-    onEditStoreClick: () -> Unit
+    onEditStoreClick: (String) -> Unit
 ){
     Column(
         modifier = modifier
@@ -42,12 +42,12 @@ fun ChooseStoreScreen(
             horizontalAlignment = Alignment.CenterHorizontally) {
             if (viewModel.storeCount() != 0)
                 viewModel.stores.collectAsState().value.forEach {
-                    Button({onEditStoreClick()}) {
+                    Button({onEditStoreClick(it.name)}) {
                         Text(it.name)
                     }
                 }
         }
-        Button(onClick = {onEditStoreClick()}) {
+        Button(onClick = {onEditStoreClick("")}) {
             Text("Add New Store")
         }
     }

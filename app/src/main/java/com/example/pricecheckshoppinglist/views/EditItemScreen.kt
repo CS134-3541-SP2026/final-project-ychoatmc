@@ -26,7 +26,6 @@ fun EditItemScreen(
     modifier: Modifier,
     onBackClick: () -> Unit,
     onMainPageClick: () -> Unit,
-    decimalFormatter: (String) -> String
 ){
     Column(
         modifier = modifier
@@ -61,7 +60,7 @@ fun EditItemScreen(
             OutlinedTextField(
                 modifier = Modifier.width(120.dp),
                 value = price.value,
-                onValueChange = { price.value = decimalFormatter(it) },
+                onValueChange = { price.value = it},
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 label = { Text("Price") }
             )
@@ -76,7 +75,7 @@ fun EditItemScreen(
             OutlinedTextField(
                 modifier = Modifier.width(120.dp),
                 value = quantity.value,
-                onValueChange = { quantity.value = decimalFormatter(it) },
+                onValueChange = { quantity.value = it },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 label = { Text("Quantity") }
             )

@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.pricecheckshoppinglist.viewModels.StoreViewModel
+import org.intellij.lang.annotations.Pattern
 
 @Composable
 fun EditStoreScreen(
@@ -29,7 +30,6 @@ fun EditStoreScreen(
     modifier: Modifier,
     onBackClick: () -> Unit,
     onMainPageClick: () -> Unit,
-    decimalFormatter: (String) -> String,
     editStore: String
 ){
     Column(
@@ -43,9 +43,12 @@ fun EditStoreScreen(
         val city = remember { mutableStateOf("") }
         val tax = remember { mutableStateOf("") }
         var storeAdded = false
+        val regex = "\\d{1,2}\\.\\d{1,2}".toRegex()
 
-        if(editStore != "new"){
+        if(!editStore.isEmpty()){
             name.value = editStore
+            city.value = viewModel.getCity(editStore)
+            tax.value = viewModel.getTax(editStore).toString()
         }
 
         Button(onClick = onBackClick,
@@ -79,8 +82,7 @@ fun EditStoreScreen(
                 modifier = Modifier.fillMaxWidth()
                     .padding(bottom = 15.dp),
                 value = tax.value,
-                onValueChange = { tax.value = decimalFormatter(it) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                onValueChange = { tax.value = it },
                 label = { Text("Sales Tax") }
             )
         }
@@ -95,8 +97,10 @@ fun EditStoreScreen(
                     viewModel.addStore(name.value)
                      if(!city.value.isEmpty()){
                        viewModel.editCity(name.value, city.value)}
-                    //if(!tax.value.isEmpty()){
-                    //  viewModel.editTax(name.value, tax.value.toDouble())}
+                    if(!tax.value.isEmpty()){
+                        if(regex.matches(tax.value)){
+                            viewModel.editTax(name.value, tax.value.toDouble())}
+                    }
                 }) {
                 Text("Save")
             }

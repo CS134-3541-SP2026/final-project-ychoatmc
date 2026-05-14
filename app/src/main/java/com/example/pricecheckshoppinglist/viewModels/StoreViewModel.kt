@@ -55,6 +55,22 @@ class StoreViewModel : ViewModel() {
         return name
     }
 
+    fun getCity(name: String) : String{
+        _stores.value.forEach {
+            if(it.name == name)
+                return it.city
+        }
+        return ""
+    }
+
+    fun getTax(name: String): Double {
+        _stores.value.forEach {
+            if(it.name == name)
+                return it.tax
+        }
+        return 0.0
+    }
+
     fun editCity(name: String, city: String) {
         _stores.value.forEach {
             if (it.name == name) {

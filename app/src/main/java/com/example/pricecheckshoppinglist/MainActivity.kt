@@ -12,11 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import com.example.pricecheckshoppinglist.viewModels.StoreViewModel
 import com.example.pricecheckshoppinglist.ui.theme.PriceCheckShoppingListTheme
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.pricecheckshoppinglist.viewModels.ItemViewModel
 import com.example.pricecheckshoppinglist.views.ChooseStoreScreen
 import com.example.pricecheckshoppinglist.views.EditItemScreen
@@ -36,58 +38,14 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-object Destinations{
+object Destinations {
     val HOME_SCREEN = "home_screen"
     val STORE_SCREEN = "store_screen"
-    val STORE_EDIT_SCREEN = "store_edit_screen"
+    val STORE_EDIT_SCREEN = "store_edit_screen/{storeName}"
     val LIST_SCREEN = "list_screen"
     val EDIT_ITEM_SCREEN = "edit_item_screen"
-}
-
-class DecimalFormatter(
-    symbols: DecimalFormatSymbols = DecimalFormatSymbols.getInstance()
-){
-    private val decimalSeparator = symbols.decimalSeparator
-
-    fun cleanup(input: String) : String {
-        if (input.matches("\\D".toRegex())) return ""
-        if (input.matches("0+".toRegex())) return "0"
-
-        val sb = StringBuilder()
-
-        var leadingDigits = 0
-        var endingDigits = 0
-        var hasDecimalSep = false
-        var invalidEntry = false
-
-        for (char in input){
-            if (char.isDigit()){
-                if(!hasDecimalSep && !invalidEntry) {
-                    if (leadingDigits < 2) {
-                        sb.append(char)
-                        leadingDigits += 1
-                    }
-                    else{
-                        invalidEntry = true
-                    }
-                }
-                else{
-                    if(endingDigits < 2){
-                        sb.append(char)
-                        endingDigits += 1
-                    }
-                }
-                continue
-            }
-            if (char == decimalSeparator && !hasDecimalSep && sb.isEmpty()){
-                sb.append(char)
-                hasDecimalSep = true
-            }
-        }
-
-        if(invalidEntry)
-            return "Invalid Entry"
-        return sb.toString()
+    fun editStoreScreen(storeName: String): String {
+        return "store_edit_screen/$storeName"
     }
 }
 
@@ -113,17 +71,25 @@ fun PriceCheckShoppingApp() {
             ChooseStoreScreen(
                 modifier = Modifier,
                 onBackClick = { shoppingListNavController.popBackStack() },
-                onEditStoreClick = {shoppingListNavController.navigate(Destinations.STORE_EDIT_SCREEN)},
+                onEditStoreClick = {
+                    storeName ->
+                    shoppingListNavController.navigate(Destinations.editStoreScreen(storeName))},
                 viewModel = homeViewModel
             )
         }
-        composable (route = Destinations.STORE_EDIT_SCREEN) {
+        composable (route = Destinations.STORE_EDIT_SCREEN,
+            arguments = listOf(navArgument("storeName"){
+                type = NavType.StringType
+            })) {
+            backStackEntry ->
+            val storeName = backStackEntry.arguments?.getString("storeName")
+                ?: return@composable
             EditStoreScreen(modifier = Modifier,
                 onBackClick = {shoppingListNavController.popBackStack()},
                 onMainPageClick = {shoppingListNavController.navigate(Destinations.HOME_SCREEN)},
                 viewModel = homeViewModel,
-                editStore = String(),
-                decimalFormatter = {DecimalFormatter().cleanup(String())})
+                editStore = storeName
+            )
         }
         composable (route = Destinations.LIST_SCREEN){
             ListScreen(modifier = Modifier,
@@ -135,8 +101,8 @@ fun PriceCheckShoppingApp() {
             EditItemScreen(modifier = Modifier,
                 onBackClick = {shoppingListNavController.popBackStack()},
                 viewModel = itemViewModel,
-                onMainPageClick = {shoppingListNavController.navigate(Destinations.HOME_SCREEN)},
-                decimalFormatter = { DecimalFormatter().cleanup(String())})
+                onMainPageClick = {shoppingListNavController.navigate(Destinations.HOME_SCREEN)}
+            )
         }
     }
     /**
