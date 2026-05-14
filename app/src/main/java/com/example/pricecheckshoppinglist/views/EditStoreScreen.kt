@@ -42,11 +42,13 @@ fun EditStoreScreen(
         val name = remember { mutableStateOf("") }
         val city = remember { mutableStateOf("") }
         val tax = remember { mutableStateOf("") }
+        var title = "Add Store"
         var storeAdded = false
         val regex = "\\d{1,2}\\.\\d{1,2}".toRegex()
 
         if(!editStore.isEmpty()){
             name.value = editStore
+            title = "Edit $editStore"
             city.value = viewModel.getCity(editStore)
             tax.value = viewModel.getTax(editStore).toString()
         }
@@ -55,7 +57,7 @@ fun EditStoreScreen(
             modifier = modifier.align(Alignment.Start)) {
             Text("Back")
         }
-        Text("Edit Store",
+        Text(title,
             modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center)
@@ -104,11 +106,11 @@ fun EditStoreScreen(
                 }) {
                 Text("Save")
             }
-        }
+        }/**
         Text("Store Count: ${viewModel.storeCount()}")
         Text("Store name: ${name.value}")
         Text("City: ${city.value}")
         Text("Tax: ${tax.value}")
-        Text("Store added: $storeAdded")
+        Text("Store added: $storeAdded")*/
     }
 }
