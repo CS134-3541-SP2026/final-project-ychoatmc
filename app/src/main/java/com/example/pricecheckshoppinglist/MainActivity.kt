@@ -3,12 +3,6 @@ package com.example.pricecheckshoppinglist
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,18 +12,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.pricecheckshoppinglist.ViewModel.StoreViewModel
+import com.example.pricecheckshoppinglist.viewModels.StoreViewModel
 import com.example.pricecheckshoppinglist.ui.theme.PriceCheckShoppingListTheme
-import com.example.pricecheckshoppinglist.Views.MainStoreView
-import androidx.compose.ui.res.painterResource
-import androidx.navigation.NavHost
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.pricecheckshoppinglist.Views.ChooseStoreEditView
-import com.example.pricecheckshoppinglist.Views.EditItemView
-import com.example.pricecheckshoppinglist.Views.ListView
-import com.example.pricecheckshoppinglist.Views.StoreEditView
+import com.example.pricecheckshoppinglist.viewModels.ItemViewModel
+import com.example.pricecheckshoppinglist.views.ChooseStoreScreen
+import com.example.pricecheckshoppinglist.views.EditItemScreen
+import com.example.pricecheckshoppinglist.views.EditStoreScreen
+import com.example.pricecheckshoppinglist.views.HomeScreen
+import com.example.pricecheckshoppinglist.views.ListScreen
 import java.text.DecimalFormatSymbols
 
 
@@ -103,6 +96,7 @@ class DecimalFormatter(
 fun PriceCheckShoppingApp() {
     var currentDestination by rememberSaveable() { mutableStateOf(AppDestinations.HOME)}
     val homeViewModel: StoreViewModel = viewModel()
+    val itemViewModel: ItemViewModel = viewModel()
     val shoppingListNavController = rememberNavController()
 
     NavHost(
@@ -110,29 +104,37 @@ fun PriceCheckShoppingApp() {
         startDestination = Destinations.HOME_SCREEN
     ){
         composable(route = Destinations.HOME_SCREEN){
-            MainStoreView(modifier = Modifier,
+            HomeScreen(modifier = Modifier,
                 onStoreEditClick = {shoppingListNavController.navigate(Destinations.STORE_SCREEN)},
-                onListClick = {shoppingListNavController.navigate(route = Destinations.LIST_SCREEN)})
+                onListClick = {shoppingListNavController.navigate(route = Destinations.LIST_SCREEN)},
+                viewModel = homeViewModel)
         }
         composable (route = Destinations.STORE_SCREEN){
-            ChooseStoreEditView(modifier = Modifier,
-                onBackClick = {shoppingListNavController.popBackStack()},
-                onEditPageClick = {shoppingListNavController.navigate(Destinations.STORE_EDIT_SCREEN)})
+            ChooseStoreScreen(
+                modifier = Modifier,
+                onBackClick = { shoppingListNavController.popBackStack() },
+                onEditStoreClick = {shoppingListNavController.navigate(Destinations.STORE_EDIT_SCREEN)},
+                viewModel = homeViewModel
+            )
         }
         composable (route = Destinations.STORE_EDIT_SCREEN) {
-            StoreEditView(modifier = Modifier,
+            EditStoreScreen(modifier = Modifier,
                 onBackClick = {shoppingListNavController.popBackStack()},
                 onMainPageClick = {shoppingListNavController.navigate(Destinations.HOME_SCREEN)},
+                viewModel = homeViewModel,
+                editStore = String(),
                 decimalFormatter = {DecimalFormatter().cleanup(String())})
         }
         composable (route = Destinations.LIST_SCREEN){
-            ListView(modifier = Modifier,
+            ListScreen(modifier = Modifier,
+                viewModel = itemViewModel,
                 onBackClick = {shoppingListNavController.popBackStack()},
                 onEditItemPageClick = {shoppingListNavController.navigate(Destinations.EDIT_ITEM_SCREEN)})
         }
         composable (route = Destinations.EDIT_ITEM_SCREEN){
-            EditItemView(modifier = Modifier,
+            EditItemScreen(modifier = Modifier,
                 onBackClick = {shoppingListNavController.popBackStack()},
+                viewModel = itemViewModel,
                 onMainPageClick = {shoppingListNavController.navigate(Destinations.HOME_SCREEN)},
                 decimalFormatter = { DecimalFormatter().cleanup(String())})
         }

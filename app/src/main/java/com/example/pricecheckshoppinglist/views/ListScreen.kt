@@ -1,4 +1,4 @@
-package com.example.pricecheckshoppinglist.Views
+package com.example.pricecheckshoppinglist.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,10 +9,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.pricecheckshoppinglist.ViewModel.StoreViewModel
+import com.example.pricecheckshoppinglist.viewModels.ItemViewModel
 
 @Composable
-fun MainStoreView(modifier: Modifier, onStoreEditClick: () -> Unit, onListClick: () -> Unit
+fun ListScreen(
+    viewModel: ItemViewModel,
+    modifier: Modifier,
+    onBackClick: () -> Unit,
+    onEditItemPageClick: () -> Unit
 ){
     Column(
         modifier = modifier
@@ -20,8 +24,12 @@ fun MainStoreView(modifier: Modifier, onStoreEditClick: () -> Unit, onListClick:
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("Smarter Shopping App")
-        Button(onClick = onStoreEditClick) {Text("Add/Edit Store") }
-        Button(onClick = onListClick) {Text("Temporary Store One") }
+        Button(onBackClick) {
+            Text("Back")
+        }
+        Text("Temporary Title Store One")
+        Button(onClick = onEditItemPageClick) {
+            Text("Temporary Item One")
+        }
     }
 }

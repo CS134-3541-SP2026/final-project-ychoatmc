@@ -1,4 +1,4 @@
-package com.example.pricecheckshoppinglist.Views
+package com.example.pricecheckshoppinglist.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,36 +18,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.pricecheckshoppinglist.ViewModel.ItemViewModel
-import com.example.pricecheckshoppinglist.ViewModel.StoreViewModel
+import com.example.pricecheckshoppinglist.viewModels.ItemViewModel
 
 @Composable
-fun ListView(
-    viewModel: ItemViewModel = viewModel(),
-    modifier: Modifier,
-    onBackClick: () -> Unit,
-    onEditItemPageClick: () -> Unit
-){
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Button(onBackClick) {
-            Text("Back")
-        }
-        Text("Temporary Title Store One")
-        Button(onClick = onEditItemPageClick) {
-            Text("Temporary Item One")
-        }
-    }
-}
-
-@Composable
-fun EditItemView(
-    viewModel: ItemViewModel = viewModel(),
+fun EditItemScreen(
+    viewModel: ItemViewModel,
     modifier: Modifier,
     onBackClick: () -> Unit,
     onMainPageClick: () -> Unit,

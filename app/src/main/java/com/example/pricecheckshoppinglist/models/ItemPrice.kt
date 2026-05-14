@@ -1,6 +1,4 @@
-package com.example.pricecheckshoppinglist.Model
-
-import com.example.pricecheckshoppinglist.Model.Store
+package com.example.pricecheckshoppinglist.models
 
 data class ItemPrice(
     val store: Store,

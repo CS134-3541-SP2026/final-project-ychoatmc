@@ -1,8 +1,8 @@
-package com.example.pricecheckshoppinglist.ViewModel
+package com.example.pricecheckshoppinglist.viewModels
 
 import androidx.lifecycle.ViewModel
-import com.example.pricecheckshoppinglist.Model.Item
-import com.example.pricecheckshoppinglist.Model.Store
+import com.example.pricecheckshoppinglist.models.Item
+import com.example.pricecheckshoppinglist.models.Store
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -11,7 +11,7 @@ class ItemViewModel : ViewModel() {
     val allItems: StateFlow<List<Item>> = _allItems
 
     fun addItem(item: Item){
-        _allItems.value = _allItems.value + item
+        _allItems.value += item
     }
 
     fun deleteStore(item: Item, store: Store){
@@ -48,7 +48,8 @@ class ItemViewModel : ViewModel() {
         }
     }
 
-    fun editPrice(item: Item, store: Store, unit: String){
+    /** Update Later */
+    fun editUnit(item: Item, store: Store, unit: String){
         _allItems.value.forEach {
             if(it.name == item.name){
                 it.prices.forEach {
@@ -59,6 +60,7 @@ class ItemViewModel : ViewModel() {
         }
     }
 
+    /** Update Later */
     fun editQuantity(item: Item, store: Store, quantity: Double){
         _allItems.value.forEach {
             if(it.name == item.name){
