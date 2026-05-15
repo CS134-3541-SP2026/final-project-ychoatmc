@@ -1,5 +1,6 @@
 package com.example.pricecheckshoppinglist.views
 
+import android.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,7 +30,8 @@ fun EditItemScreen(
     modifier: Modifier,
     onBackClick: () -> Unit,
     onMainPageClick: () -> Unit,
-    editItem: String
+    editItem: String,
+    store: String
 ){
     Column(
         modifier = modifier
@@ -38,18 +40,25 @@ fun EditItemScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val name = remember { mutableStateOf("") }
-        val price = remember { mutableStateOf("") }
-        val unit = remember { mutableStateOf("") }
-        val quantity = remember { mutableStateOf("") }
-        val regex = "\\d{1,2}\\.\\d{1,2}".toRegex()
+        var name = remember { mutableStateOf("") }
+        var price = remember { mutableStateOf("") }
+        var unit = remember { mutableStateOf("") }
+        var quantity = remember { mutableStateOf("") }
+        val regex = "\\d+\\.\\d{1,2}".toRegex()
+        val unitRegex = "\\d+".toRegex()
         var title = "Add New Item"
+        var storeName = "Choose a Store"
 
         if(!editItem.isEmpty()){
             name.value = editItem
             title = "Edit $editItem"
-            //price.value = viewModel.getCity(editStore)
-            //tax.value = viewModel.getTax(editStore).toString()
+            price.value = viewModel.getPrice(editItem, store).toString()
+            unit.value = viewModel.getUnit(editItem, store)
+            quantity.value = viewModel.getQuantity(editItem, store).toString()
+        }
+
+        if(!store.isEmpty()){
+            storeName = "Price at $store:"
         }
 
         Button(onClick = onBackClick,
@@ -69,6 +78,9 @@ fun EditItemScreen(
                 onValueChange = { name.value = it },
                 label = { Text("Item Name") }
             )
+            Text(storeName,
+                modifier = Modifier.padding(bottom = 5.dp),
+                style = MaterialTheme.typography.titleMedium)
             Row {
                 Text("Price", modifier.width(120.dp))
                 Spacer(Modifier.width(10.dp))
@@ -109,12 +121,18 @@ fun EditItemScreen(
                 enabled = name.value.isNotBlank(),
                 onClick = {
                     viewModel.addItem(name.value)
-//                    if(!city.value.isEmpty()){
-  //                      viewModel.editCity(name.value, city.value)}
-    //                if(!tax.value.isEmpty()){
-      //                  if(regex.matches(tax.value)){
-        //                    viewModel.editTax(name.value, tax.value.toDouble())}
-          //          }
+                    viewModel.setStore(name.value, store)
+                    if(!price.value.isEmpty()){
+                        if(regex.matches(price.value)){
+                            viewModel.editPrice(name.value, store, price.value.toDouble())}
+                    }
+                    if(!unit.value.isEmpty()){
+                        viewModel.editUnit(name.value, store, unit.value)
+                    }
+                    if(!quantity.value.isEmpty()){
+                        if(regex.matches(quantity.value) || unitRegex.matches(quantity.value)){
+                            viewModel.editQuantity(name.value, store, quantity.value.toDouble())}
+                    }
                 }) {
                 Text("Save")
             }

@@ -1,7 +1,7 @@
 package com.example.pricecheckshoppinglist.models
 
 data class ItemPrice(
-    val store: Store,
+    val store: String,
     var price: Double = 0.0,
     var unit: String = "each",
     var quantity: Double = 0.0

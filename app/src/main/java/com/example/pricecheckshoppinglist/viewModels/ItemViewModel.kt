@@ -2,6 +2,7 @@ package com.example.pricecheckshoppinglist.viewModels
 
 import androidx.lifecycle.ViewModel
 import com.example.pricecheckshoppinglist.models.Item
+import com.example.pricecheckshoppinglist.models.ItemPrice
 import com.example.pricecheckshoppinglist.models.Store
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,46 +31,95 @@ class ItemViewModel : ViewModel() {
         _allItems.value = tempList
     }
 
-    fun editName(item: Item, name: String){
+    fun editName(item: String, name: String){
         _allItems.value.forEach {
-            if(it.name == item.name)
+            if(it.name == item)
                 it.name = name
         }
     }
 
-    fun editPrice(item: Item, store: Store, price: Double){
+    fun setStore(item: String, store: String) : Boolean{
         _allItems.value.forEach {
-            if(it.name == item.name){
+            if(it.name == item){
                 it.prices.value.forEach {
-                    if(it.store.name == store.name)
+                    if(it.store == store){
+                        return false
+                    }
+                }
+                it.prices.value += ItemPrice(store)
+                return true
+            }
+        }
+        return false
+    }
+
+    fun editPrice(item: String, store: String, price: Double){
+        _allItems.value.forEach {
+            if(it.name == item){
+                it.prices.value.forEach {
+                    if(it.store == store)
                         it.price = price
                 }
             }
         }
     }
 
-    /** Update Later */
-    fun editUnit(item: Item, store: Store, unit: String){
+    fun editUnit(item: String, store: String, unit: String){
         _allItems.value.forEach {
-            if(it.name == item.name){
+            if(it.name == item){
                 it.prices.value.forEach {
-                    if(it.store.name == store.name)
+                    if(it.store == store)
                         it.unit = unit
                 }
             }
         }
     }
 
-    /** Update Later */
-    fun editQuantity(item: Item, store: Store, quantity: Double){
+    fun editQuantity(item: String, store: String, quantity: Double){
         _allItems.value.forEach {
-            if(it.name == item.name){
+            if(it.name == item){
                 it.prices.value.forEach {
-                    if(it.store.name == store.name)
+                    if(it.store == store)
                         it.quantity = quantity
                 }
             }
         }
+    }
+
+    fun getPrice(item: String, store: String) : Double{
+        _allItems.value.forEach {
+            if(it.name == item){
+                it.prices.value.forEach {
+                    if(it.store == store)
+                        return it.price
+                }
+            }
+        }
+        return 0.0
+    }
+
+    fun getUnit(item: String, store: String) : String{
+        _allItems.value.forEach {
+            if(it.name == item){
+                it.prices.value.forEach {
+                    if(it.store == store)
+                        return it.unit
+                }
+            }
+        }
+        return ""
+    }
+
+    fun getQuantity(item: String, store: String) : Double{
+        _allItems.value.forEach {
+            if(it.name == item){
+                it.prices.value.forEach {
+                    if(it.store == store)
+                        return it.quantity
+                }
+            }
+        }
+        return 0.0
     }
 
     fun itemCount() : Int {
