@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -19,7 +18,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.pricecheckshoppinglist.viewModels.ItemViewModel
@@ -44,17 +42,21 @@ fun EditItemScreen(
         var price = remember { mutableStateOf("") }
         var unit = remember { mutableStateOf("") }
         var quantity = remember { mutableStateOf("") }
+        var initialName = "Item Name"
+        var initalPrice = "Price"
+        var initialUnit = "Unit"
+        var initialQuantity = "Quantity"
         val regex = "\\d+\\.\\d{1,2}".toRegex()
         val unitRegex = "\\d+".toRegex()
         var title = "Add New Item"
         var storeName = "Choose a Store"
 
         if(!editItem.isEmpty()){
-            name.value = editItem
+            initialName = editItem
             title = "Edit $editItem"
-            price.value = viewModel.getPrice(editItem, store).toString()
-            unit.value = viewModel.getUnit(editItem, store)
-            quantity.value = viewModel.getQuantity(editItem, store).toString()
+            initalPrice = viewModel.getPrice(editItem, store).toString()
+            initialUnit = viewModel.getUnit(editItem, store)
+            initialQuantity = viewModel.getQuantity(editItem, store).toString()
         }
 
         if(!store.isEmpty()){
@@ -76,7 +78,7 @@ fun EditItemScreen(
                     .padding(bottom = 15.dp),
                 value = name.value,
                 onValueChange = { name.value = it },
-                label = { Text("Item Name") }
+                placeholder = {Text(initialName)}
             )
             Text(storeName,
                 modifier = Modifier.padding(bottom = 5.dp),
@@ -93,21 +95,21 @@ fun EditItemScreen(
                     modifier = Modifier.width(120.dp),
                     value = price.value,
                     onValueChange = { price.value = it },
-                    label = { Text("Price") }
+                    placeholder = {Text(initalPrice)}
                 )
                 Spacer(Modifier.width(10.dp))
                 OutlinedTextField(
                     modifier = Modifier.width(120.dp),
                     value = unit.value,
                     onValueChange = { unit.value = it },
-                    label = { Text("Unit") }
+                    placeholder = {Text(initialUnit)}
                 )
                 Spacer(Modifier.width(10.dp))
                 OutlinedTextField(
                     modifier = Modifier.width(120.dp),
                     value = quantity.value,
                     onValueChange = { quantity.value = it },
-                    label = { Text("Quantity") }
+                    placeholder = {Text(initialQuantity)}
                 )
             }
         }
@@ -118,21 +120,46 @@ fun EditItemScreen(
             }
             Spacer(modifier = Modifier.width(20.dp))
             Button(
-                enabled = name.value.isNotBlank(),
                 onClick = {
-                    viewModel.addItem(name.value)
-                    viewModel.setStore(name.value, store)
-                    if(!price.value.isEmpty()){
-                        if(regex.matches(price.value)){
-                            viewModel.editPrice(name.value, store, price.value.toDouble())}
+                    if(editItem.isEmpty()){
+                        if(!name.value.isEmpty()){
+                            viewModel.addItem(name.value)
+                            viewModel.setStore(name.value, store)
+                            if (!price.value.isEmpty() && regex.matches(price.value)) {
+                                viewModel.editPrice(name.value, store, price.value.toDouble())
+                            }
+                            if (!unit.value.isEmpty()) {
+                                viewModel.editUnit(name.value, store, unit.value)
+                            }
+                            if (!quantity.value.isEmpty() && (regex.matches(quantity.value) || unitRegex.matches(quantity.value))) {
+                                viewModel.editQuantity(
+                                    name.value,
+                                    store,
+                                    quantity.value.toDouble()
+                                )
+                            }
+                        }
                     }
-                    if(!unit.value.isEmpty()){
-                        viewModel.editUnit(name.value, store, unit.value)
+                    else{
+                        var currentItem = editItem
+                        if(!name.value.isEmpty()){
+                            viewModel.editName(editItem, name.value)
+                            currentItem = name.value
+                        }
+                        if(!viewModel.itemAtStore(currentItem, store)){
+                            viewModel.setStore(currentItem, store)
+                        }
+                        if(!price.value.isEmpty() && regex.matches(price.value)) {
+                            viewModel.editPrice(currentItem, store, price.value.toDouble())
+                        }
+                        if(!unit.value.isEmpty()){
+                            viewModel.editUnit(currentItem, store, unit.value)
+                        }
+                        if(!quantity.value.isEmpty() && (regex.matches(quantity.value) || unitRegex.matches(quantity.value))){
+                            viewModel.editQuantity(currentItem, store, quantity.value.toDouble())
+                        }
                     }
-                    if(!quantity.value.isEmpty()){
-                        if(regex.matches(quantity.value) || unitRegex.matches(quantity.value)){
-                            viewModel.editQuantity(name.value, store, quantity.value.toDouble())}
-                    }
+
                 }) {
                 Text("Save")
             }

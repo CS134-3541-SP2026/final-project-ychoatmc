@@ -25,8 +25,6 @@ import com.example.pricecheckshoppinglist.views.EditItemScreen
 import com.example.pricecheckshoppinglist.views.EditStoreScreen
 import com.example.pricecheckshoppinglist.views.HomeScreen
 import com.example.pricecheckshoppinglist.views.ListScreen
-import java.text.DecimalFormatSymbols
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

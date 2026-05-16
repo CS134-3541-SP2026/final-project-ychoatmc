@@ -86,6 +86,18 @@ class ItemViewModel : ViewModel() {
         }
     }
 
+    fun itemAtStore(item: String, store: String): Boolean{
+        _allItems.value.forEach {
+            if(it.name == item){
+                it.prices.value.forEach {
+                    if(it.store == store)
+                        return true
+                }
+            }
+        }
+        return false
+    }
+
     fun getPrice(item: String, store: String) : Double{
         _allItems.value.forEach {
             if(it.name == item){
