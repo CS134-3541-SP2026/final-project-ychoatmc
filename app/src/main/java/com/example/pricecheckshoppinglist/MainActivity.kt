@@ -1,16 +1,24 @@
 package com.example.pricecheckshoppinglist
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import com.example.pricecheckshoppinglist.viewModels.StoreViewModel
@@ -25,7 +33,10 @@ import com.example.pricecheckshoppinglist.views.EditItemScreen
 import com.example.pricecheckshoppinglist.views.EditStoreScreen
 import com.example.pricecheckshoppinglist.views.HomeScreen
 import com.example.pricecheckshoppinglist.views.ListScreen
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
+val Context.dataStore by preferencesDataStore("store_prefs")
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,13 +66,30 @@ object Destinations {
     }
 }
 
+@SuppressLint("FlowOperatorInvokedInComposition", "CoroutineCreationDuringComposition")
 @PreviewScreenSizes
 @Composable
 fun PriceCheckShoppingApp() {
+    val context: Context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val TOTAL_STORES = intPreferencesKey("total_stores")
+    val totalNumberStores by context.dataStore.data
+        .map { it[TOTAL_STORES]?: 0 }
+        .collectAsState(initial = 0)
+    var localTotalNumberStores = totalNumberStores
     var currentDestination by rememberSaveable() { mutableStateOf(AppDestinations.HOME)}
     val homeViewModel: StoreViewModel = viewModel()
     val itemViewModel: ItemViewModel = viewModel()
     val shoppingListNavController = rememberNavController()
+
+    if(homeViewModel.storeCount() < totalNumberStores){
+        val start = homeViewModel.storeCount()
+        for(i in start ..< totalNumberStores){
+            scope.launch {
+                homeViewModel.load(context, i)
+            }
+        }
+    }
 
     NavHost(
         navController = shoppingListNavController,
@@ -96,8 +124,17 @@ fun PriceCheckShoppingApp() {
                 onBackClick = {shoppingListNavController.popBackStack()},
                 onMainPageClick = {shoppingListNavController.navigate(Destinations.HOME_SCREEN)},
                 viewModel = homeViewModel,
-                editStore = storeName
-            )
+                editStore = storeName,
+                onSaveClick =
+                {
+                    currentStore ->
+                    scope.launch {
+                        homeViewModel.save(context, currentStore)
+                        context.dataStore.edit { prefs ->
+                            prefs[TOTAL_STORES] = homeViewModel.storeCount()
+                        }
+                        }
+                })
         }
         composable (route = Destinations.LIST_SCREEN,
             arguments = listOf(navArgument("storeName"){

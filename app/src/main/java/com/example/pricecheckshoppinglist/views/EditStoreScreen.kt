@@ -1,5 +1,6 @@
 package com.example.pricecheckshoppinglist.views
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -20,13 +22,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.pricecheckshoppinglist.viewModels.StoreViewModel
+import kotlin.coroutines.CoroutineContext
+
 @Composable
 fun EditStoreScreen(
     viewModel: StoreViewModel,
     modifier: Modifier,
     onBackClick: () -> Unit,
     onMainPageClick: () -> Unit,
-    editStore: String
+    editStore: String,
+    onSaveClick: (String) -> Unit
 ){
     Column(
         modifier = modifier
@@ -95,33 +100,31 @@ fun EditStoreScreen(
             Button(
 //                enabled = name.value.isNotBlank(),
                 onClick = {
-                    if(editStore.isEmpty()){
-                        if(!name.value.isEmpty()) {
-                            viewModel.addStore(name.value)
-                            if (!city.value.isEmpty()) {
-                                viewModel.editCity(name.value, city.value)
-                            }
-                            if (!tax.value.isEmpty()) {
-                                if (regex.matches(tax.value)) {
-                                    viewModel.editTax(name.value, tax.value.toDouble())
-                                }
-                            }
+                    var currentStore = ""
+                    //Editing existing store
+                    if(!editStore.isEmpty()){
+                        currentStore = editStore
+                        if(!name.value.isEmpty()){
+                            currentStore = name.value
+                            viewModel.editName(editStore, name.value)
                         }
                     }
-                    else{
-                        var currentStore = editStore
-                        if(!name.value.isEmpty()) {
-                            viewModel.editName(editStore, name.value)
-                            currentStore = name.value
-                        }
+                    //Adding new store
+                    else if(!name.value.isEmpty()){
+                        currentStore = name.value
+                        viewModel.addStore(currentStore)
+                    }
+                    //Valid entry to edit/add
+                    if(!currentStore.isEmpty()){
                         if (!city.value.isEmpty()) {
-                            viewModel.editCity(currentStore, city.value)
+                            viewModel.editCity(name.value, city.value)
                         }
                         if (!tax.value.isEmpty()) {
                             if (regex.matches(tax.value)) {
-                                viewModel.editTax(currentStore, tax.value.toDouble())
+                                viewModel.editTax(name.value, tax.value.toDouble())
                             }
                         }
+                        onSaveClick(currentStore)
                     }
                 }) {
                 Text("Save")
