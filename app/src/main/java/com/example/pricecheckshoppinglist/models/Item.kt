@@ -1,8 +1,12 @@
 package com.example.pricecheckshoppinglist.models
 
+import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Item(
+    var id: Int,
     var name: String,
-    val prices: MutableStateFlow<List<ItemPrice>> = MutableStateFlow<List<ItemPrice>>(emptyList())
+    val prices: MutableList<ItemPrice> = mutableListOf<ItemPrice>()
 )

@@ -1,7 +1,10 @@
 package com.example.pricecheckshoppinglist.models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ItemPrice(
-    val store: String,
+    val store: String = "",
     var price: Double = 0.0,
     var unit: String = "each",
     var quantity: Double = 0.0

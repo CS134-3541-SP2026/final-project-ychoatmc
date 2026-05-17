@@ -76,7 +76,10 @@ fun PriceCheckShoppingApp() {
     val totalNumberStores by context.dataStore.data
         .map { it[TOTAL_STORES]?: 0 }
         .collectAsState(initial = 0)
-    var localTotalNumberStores = totalNumberStores
+    val TOTAL_ITEMS = intPreferencesKey("total_items")
+    val totalNumberItems by context.dataStore.data
+        .map { it[TOTAL_ITEMS]?: 0 }
+        .collectAsState(initial = 0)
     var currentDestination by rememberSaveable() { mutableStateOf(AppDestinations.HOME)}
     val homeViewModel: StoreViewModel = viewModel()
     val itemViewModel: ItemViewModel = viewModel()
@@ -87,6 +90,15 @@ fun PriceCheckShoppingApp() {
         for(i in start ..< totalNumberStores){
             scope.launch {
                 homeViewModel.load(context, i)
+            }
+        }
+    }
+
+    if(itemViewModel.itemCount() < totalNumberItems){
+        val start = itemViewModel.itemCount()
+        for (i in start..< totalNumberItems){
+            scope.launch {
+                itemViewModel.load(context, i)
             }
         }
     }
@@ -133,7 +145,7 @@ fun PriceCheckShoppingApp() {
                         context.dataStore.edit { prefs ->
                             prefs[TOTAL_STORES] = homeViewModel.storeCount()
                         }
-                        }
+                    }
                 })
         }
         composable (route = Destinations.LIST_SCREEN,
@@ -165,7 +177,16 @@ fun PriceCheckShoppingApp() {
                 viewModel = itemViewModel,
                 editItem = itemName,
                 store = storeName,
-                onMainPageClick = {shoppingListNavController.navigate(Destinations.HOME_SCREEN)}
+                onMainPageClick = {shoppingListNavController.navigate(Destinations.HOME_SCREEN)},
+                onSaveClick = {
+                    currentItem ->
+                    scope.launch {
+                        itemViewModel.save(context, currentItem)
+                        context.dataStore.edit { prefs ->
+                            prefs[TOTAL_ITEMS] = itemViewModel.allItems.value.size
+                        }
+                    }
+                }
             )
         }
     }

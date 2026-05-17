@@ -1,6 +1,5 @@
 package com.example.pricecheckshoppinglist.views
 
-import android.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,7 +28,8 @@ fun EditItemScreen(
     onBackClick: () -> Unit,
     onMainPageClick: () -> Unit,
     editItem: String,
-    store: String
+    store: String,
+    onSaveClick: (String) -> Unit
 ){
     Column(
         modifier = modifier
@@ -121,43 +121,36 @@ fun EditItemScreen(
             Spacer(modifier = Modifier.width(20.dp))
             Button(
                 onClick = {
-                    if(editItem.isEmpty()){
+                    var currentItem = ""
+                    //Editing existing item
+                    if(!editItem.isEmpty()){
+                        currentItem = editItem
                         if(!name.value.isEmpty()){
-                            viewModel.addItem(name.value)
-                            viewModel.setStore(name.value, store)
-                            if (!price.value.isEmpty() && regex.matches(price.value)) {
-                                viewModel.editPrice(name.value, store, price.value.toDouble())
-                            }
-                            if (!unit.value.isEmpty()) {
-                                viewModel.editUnit(name.value, store, unit.value)
-                            }
-                            if (!quantity.value.isEmpty() && (regex.matches(quantity.value) || unitRegex.matches(quantity.value))) {
-                                viewModel.editQuantity(
-                                    name.value,
-                                    store,
-                                    quantity.value.toDouble()
-                                )
-                            }
-                        }
-                    }
-                    else{
-                        var currentItem = editItem
-                        if(!name.value.isEmpty()){
-                            viewModel.editName(editItem, name.value)
                             currentItem = name.value
+                            viewModel.editName(editItem, name.value)
                         }
                         if(!viewModel.itemAtStore(currentItem, store)){
                             viewModel.setStore(currentItem, store)
                         }
-                        if(!price.value.isEmpty() && regex.matches(price.value)) {
+                    }
+                    //Adding new item
+                    else if(!name.value.isEmpty()){
+                        currentItem = name.value
+                        viewModel.addItem(currentItem)
+                        viewModel.setStore(currentItem, store)
+                    }
+                    //Valid entry to edit/add
+                    if(!currentItem.isEmpty()){
+                        if (!price.value.isEmpty() && regex.matches(price.value)) {
                             viewModel.editPrice(currentItem, store, price.value.toDouble())
                         }
-                        if(!unit.value.isEmpty()){
+                        if (!unit.value.isEmpty()) {
                             viewModel.editUnit(currentItem, store, unit.value)
                         }
-                        if(!quantity.value.isEmpty() && (regex.matches(quantity.value) || unitRegex.matches(quantity.value))){
+                        if (!quantity.value.isEmpty() && (regex.matches(quantity.value) || unitRegex.matches(quantity.value))) {
                             viewModel.editQuantity(currentItem, store, quantity.value.toDouble())
                         }
+                        onSaveClick(currentItem)
                     }
 
                 }) {
