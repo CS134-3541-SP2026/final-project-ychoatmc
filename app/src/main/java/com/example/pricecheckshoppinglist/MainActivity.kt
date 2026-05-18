@@ -87,8 +87,8 @@ fun PriceCheckShoppingApp() {
 
     if(homeViewModel.storeCount() < totalNumberStores){
         val start = homeViewModel.storeCount()
-        for(i in start ..< totalNumberStores){
-            scope.launch {
+        scope.launch {
+            for(i in start ..< totalNumberStores){
                 homeViewModel.load(context, i)
             }
         }
@@ -96,8 +96,8 @@ fun PriceCheckShoppingApp() {
 
     if(itemViewModel.itemCount() < totalNumberItems){
         val start = itemViewModel.itemCount()
-        for (i in start..< totalNumberItems){
-            scope.launch {
+        scope.launch {
+            for (i in start..< totalNumberItems){
                 itemViewModel.load(context, i)
             }
         }

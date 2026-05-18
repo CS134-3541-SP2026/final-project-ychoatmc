@@ -15,24 +15,23 @@ import kotlinx.serialization.json.Json
 class StoreViewModel : ViewModel() {
     private val _stores = MutableStateFlow<List<Store>>(emptyList())
     val stores: StateFlow<List<Store>> = _stores
-    var storeKey = "store_"
-    fun key() = stringPreferencesKey(storeKey)
-
-    suspend fun save(context: Context, store: String){
-        _stores.value.forEach {
-            if(it.name == store) {
-                storeKey += it.id
-                val json = Json.encodeToString(it)
-                context.dataStore.edit { it[key()] = json }
-            }
-        }
-    }
+    var storeKey = 0
+    fun key() = stringPreferencesKey("store_$storeKey")
 
     suspend fun load(context: Context, keyInt: Int){
-        storeKey += keyInt
+        storeKey = keyInt
         val json: String? = context.dataStore.data.map { it[key()] }.first()
         if(json != null){
             _stores.value += Json.decodeFromString<Store>(json)
+        }
+    }
+    suspend fun save(context: Context, store: String){
+        _stores.value.forEach {
+            if(it.name == store) {
+                storeKey = it.id
+                val json = Json.encodeToString(it)
+                context.dataStore.edit { it[key()] = json }
+            }
         }
     }
 
@@ -113,6 +112,16 @@ class StoreViewModel : ViewModel() {
                 it.tax = tax
             }
         }
+    }
+
+    //temp
+    fun getId(name: String): Int{
+        _stores.value.forEach {
+            if(it.name == name){
+                return it.id
+            }
+        }
+        return 99
     }
 
     fun storeCount() : Int {

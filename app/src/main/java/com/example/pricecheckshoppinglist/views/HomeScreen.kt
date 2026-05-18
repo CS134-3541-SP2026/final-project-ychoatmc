@@ -1,6 +1,7 @@
 package com.example.pricecheckshoppinglist.views
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,16 +13,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.pricecheckshoppinglist.viewModels.StoreViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
 @Composable
 fun HomeScreen(modifier: Modifier, onStoreEditClick: () -> Unit, onListClick: (String) -> Unit,
-                  viewModel: StoreViewModel
+               viewModel: StoreViewModel
 ){
     Column(
         modifier = modifier
@@ -29,9 +33,7 @@ fun HomeScreen(modifier: Modifier, onStoreEditClick: () -> Unit, onListClick: (S
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        val storeList by viewModel.stores.collectAsState()
-
+    ){
         Text("Smarter Shopping App",
             modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.headlineMedium,

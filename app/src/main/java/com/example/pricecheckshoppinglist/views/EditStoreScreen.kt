@@ -101,35 +101,39 @@ fun EditStoreScreen(
 //                enabled = name.value.isNotBlank(),
                 onClick = {
                     var currentStore = ""
-                    //Editing existing store
-                    if(!editStore.isEmpty()){
-                        currentStore = editStore
-                        if(!name.value.isEmpty()){
+                    if(!editStore.isEmpty() || !name.value.isEmpty()){
+                        //add new store
+                        if(editStore.isEmpty()){
                             currentStore = name.value
-                            viewModel.editName(editStore, name.value)
+                            viewModel.addStore(currentStore)
                         }
-                    }
-                    //Adding new store
-                    else if(!name.value.isEmpty()){
-                        currentStore = name.value
-                        viewModel.addStore(currentStore)
-                    }
-                    //Valid entry to edit/add
-                    if(!currentStore.isEmpty()){
+                        //or not
+                        else{
+                            currentStore = editStore
+                        }
+                        //update city & tax if applicable
                         if (!city.value.isEmpty()) {
-                            viewModel.editCity(name.value, city.value)
+                            viewModel.editCity(currentStore, city.value)
                         }
                         if (!tax.value.isEmpty()) {
                             if (regex.matches(tax.value)) {
-                                viewModel.editTax(name.value, tax.value.toDouble())
+                                viewModel.editTax(currentStore, tax.value.toDouble())
                             }
+                        }
+                        //edit name of existing store if applicable
+                        if(!editStore.isEmpty() && !name.value.isEmpty()){
+                            currentStore = name.value
+                            viewModel.editName(editStore, name.value)
                         }
                         onSaveClick(currentStore)
                     }
                 }) {
                 Text("Save")
             }
-        }/**
+        }
+        Text("Store Name: $editStore")
+        Text("Store Id: ${viewModel.getId(editStore)}")
+        /**
         Text("Store Count: ${viewModel.storeCount()}")
         Text("Store name: ${name.value}")
         Text("City: ${city.value}")

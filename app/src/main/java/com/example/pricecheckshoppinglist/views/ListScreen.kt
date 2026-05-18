@@ -57,6 +57,11 @@ fun ListScreen(
                     ){
                         var textColor by remember { mutableStateOf(Color.Black) }
                         var isChecked by remember { mutableStateOf(false) }
+                        var quantity = viewModel.getQuantity(it.name, storeName)
+                        if(quantity == 0.0){
+                            textColor = Color.LightGray
+                            isChecked = true
+                        }
                         Checkbox(checked = isChecked, onCheckedChange = {
                             isChecked = it
                             if(isChecked) {
@@ -69,7 +74,7 @@ fun ListScreen(
                         TextButton({ onEditItemPageClick(it.name, storeName) }) {
                             Text(it.name, color = textColor)
                         }
-                        Text(viewModel.getQuantity(it.name, storeName).toString() + " " +
+                        Text(quantity.toString() + " " +
                         viewModel.getUnit(it.name, storeName),
                             textAlign = TextAlign.Right,
                             color = textColor,

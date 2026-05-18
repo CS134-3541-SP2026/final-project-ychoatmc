@@ -18,13 +18,13 @@ import kotlin.collections.plus
 class ItemViewModel : ViewModel() {
     private val _allItems = MutableStateFlow<List<Item>>(emptyList())
     val allItems: StateFlow<List<Item>> = _allItems
-    var itemKey = "item_"
-    fun key() = stringPreferencesKey(itemKey)
+    var itemKey = 0
+    fun key() = stringPreferencesKey("item_$itemKey")
 
     suspend fun save(context: Context, item: String){
         _allItems.value.forEach {
             if(it.name == item) {
-                itemKey += it.id
+                itemKey = it.id
                 val json = Json.encodeToString(it)
                 context.dataStore.edit { it[key()] = json }
             }
@@ -32,7 +32,7 @@ class ItemViewModel : ViewModel() {
     }
 
     suspend fun load(context: Context, keyInt: Int){
-        itemKey += keyInt
+        itemKey = keyInt
         val json: String? = context.dataStore.data.map { it[key()] }.first()
         if(json != null){
             _allItems.value += Json.decodeFromString<Item>(json)
