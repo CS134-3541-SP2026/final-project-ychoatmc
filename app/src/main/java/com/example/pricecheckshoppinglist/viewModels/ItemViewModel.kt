@@ -21,6 +21,14 @@ class ItemViewModel : ViewModel() {
     var itemKey = 0
     fun key() = stringPreferencesKey("item_$itemKey")
 
+    suspend fun load(context: Context){
+        var json: String? = context.dataStore.data.map { it[key()] }.first()
+        while(json != null) {
+            _allItems.value += Json.decodeFromString<Item>(json)
+            itemKey++
+            json = context.dataStore.data.map { it[key()] }.first()
+        }
+    }
     suspend fun save(context: Context, item: String){
         _allItems.value.forEach {
             if(it.name == item) {
@@ -31,13 +39,6 @@ class ItemViewModel : ViewModel() {
         }
     }
 
-    suspend fun load(context: Context, keyInt: Int){
-        itemKey = keyInt
-        val json: String? = context.dataStore.data.map { it[key()] }.first()
-        if(json != null){
-            _allItems.value += Json.decodeFromString<Item>(json)
-        }
-    }
     fun addItem(itemName: String){
         _allItems.value += Item(_allItems.value.size, itemName)
     }

@@ -18,11 +18,12 @@ class StoreViewModel : ViewModel() {
     var storeKey = 0
     fun key() = stringPreferencesKey("store_$storeKey")
 
-    suspend fun load(context: Context, keyInt: Int){
-        storeKey = keyInt
-        val json: String? = context.dataStore.data.map { it[key()] }.first()
-        if(json != null){
+    suspend fun load(context: Context){
+        var json: String? = context.dataStore.data.map { it[key()] }.first()
+        while(json != null) {
             _stores.value += Json.decodeFromString<Store>(json)
+            storeKey++
+            json = context.dataStore.data.map { it[key()] }.first()
         }
     }
     suspend fun save(context: Context, store: String){

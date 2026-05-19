@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import com.example.pricecheckshoppinglist.viewModels.StoreViewModel
@@ -72,35 +73,19 @@ object Destinations {
 fun PriceCheckShoppingApp() {
     val context: Context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val TOTAL_STORES = intPreferencesKey("total_stores")
-    val totalNumberStores by context.dataStore.data
-        .map { it[TOTAL_STORES]?: 0 }
-        .collectAsState(initial = 0)
-    val TOTAL_ITEMS = intPreferencesKey("total_items")
-    val totalNumberItems by context.dataStore.data
-        .map { it[TOTAL_ITEMS]?: 0 }
-        .collectAsState(initial = 0)
     var currentDestination by rememberSaveable() { mutableStateOf(AppDestinations.HOME)}
     val homeViewModel: StoreViewModel = viewModel()
     val itemViewModel: ItemViewModel = viewModel()
     val shoppingListNavController = rememberNavController()
 
-    if(homeViewModel.storeCount() < totalNumberStores){
-        val start = homeViewModel.storeCount()
-        scope.launch {
-            for(i in start ..< totalNumberStores){
-                homeViewModel.load(context, i)
-            }
-        }
+
+    homeViewModel.viewModelScope.launch {
+        homeViewModel.load(context)
     }
 
-    if(itemViewModel.itemCount() < totalNumberItems){
-        val start = itemViewModel.itemCount()
-        scope.launch {
-            for (i in start..< totalNumberItems){
-                itemViewModel.load(context, i)
-            }
-        }
+
+    scope.launch {
+        itemViewModel.load(context)
     }
 
     NavHost(
@@ -142,9 +127,6 @@ fun PriceCheckShoppingApp() {
                     currentStore ->
                     scope.launch {
                         homeViewModel.save(context, currentStore)
-                        context.dataStore.edit { prefs ->
-                            prefs[TOTAL_STORES] = homeViewModel.storeCount()
-                        }
                     }
                 })
         }
@@ -182,9 +164,6 @@ fun PriceCheckShoppingApp() {
                     currentItem ->
                     scope.launch {
                         itemViewModel.save(context, currentItem)
-                        context.dataStore.edit { prefs ->
-                            prefs[TOTAL_ITEMS] = itemViewModel.allItems.value.size
-                        }
                     }
                 }
             )
