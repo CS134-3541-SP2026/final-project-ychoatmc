@@ -1,7 +1,5 @@
 package com.example.pricecheckshoppinglist.models
 
-import androidx.compose.runtime.mutableStateOf
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.Serializable
 
 @Serializable

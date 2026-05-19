@@ -6,18 +6,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -34,7 +27,6 @@ import com.example.pricecheckshoppinglist.views.EditItemScreen
 import com.example.pricecheckshoppinglist.views.EditStoreScreen
 import com.example.pricecheckshoppinglist.views.HomeScreen
 import com.example.pricecheckshoppinglist.views.ListScreen
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 val Context.dataStore by preferencesDataStore("store_prefs")
@@ -73,7 +65,6 @@ object Destinations {
 fun PriceCheckShoppingApp() {
     val context: Context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var currentDestination by rememberSaveable() { mutableStateOf(AppDestinations.HOME)}
     val homeViewModel: StoreViewModel = viewModel()
     val itemViewModel: ItemViewModel = viewModel()
     val shoppingListNavController = rememberNavController()
@@ -143,7 +134,8 @@ fun PriceCheckShoppingApp() {
                 onEditItemPageClick = {
                     itemName, storeName ->
                     shoppingListNavController.navigate(Destinations.itemEditScreen(itemName, storeName))},
-                storeName = storeName)
+                storeName = storeName,
+                storeViewModel = homeViewModel)
         }
         composable (route = Destinations.EDIT_ITEM_SCREEN,
             arguments = listOf(navArgument("itemName"){
@@ -196,13 +188,6 @@ fun PriceCheckShoppingApp() {
             }
         }
     }*/
-}
-
-enum class AppDestinations(
-    val label: String,
-    val icon: Int
-){
-    HOME("Home", R.drawable.outline_home_24)
 }
 
 @Preview(showBackground = true)

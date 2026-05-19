@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import com.example.pricecheckshoppinglist.dataStore
 import com.example.pricecheckshoppinglist.models.Item
 import com.example.pricecheckshoppinglist.models.ItemPrice
-import com.example.pricecheckshoppinglist.models.Store
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first

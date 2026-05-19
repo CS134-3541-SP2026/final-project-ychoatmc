@@ -1,6 +1,5 @@
 package com.example.pricecheckshoppinglist.views
 
-import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,7 +13,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -22,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.pricecheckshoppinglist.viewModels.StoreViewModel
-import kotlin.coroutines.CoroutineContext
 
 @Composable
 fun EditStoreScreen(
@@ -40,14 +37,13 @@ fun EditStoreScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        var name = remember { mutableStateOf("") }
-        var city = remember { mutableStateOf("") }
-        var tax = remember { mutableStateOf("") }
+        val name = remember { mutableStateOf("") }
+        val city = remember { mutableStateOf("") }
+        val tax = remember { mutableStateOf("") }
         var initialName = "Store Name"
         var initialCity = "City"
         var initialTax = "0.0"
         var title = "Add Store"
-        var storeAdded = false
         val regex = "\\d{1,2}\\.\\d{1,2}".toRegex()
 
         if(!editStore.isEmpty()){

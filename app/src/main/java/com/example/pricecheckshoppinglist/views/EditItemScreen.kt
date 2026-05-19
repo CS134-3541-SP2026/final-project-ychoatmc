@@ -38,12 +38,12 @@ fun EditItemScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        var name = remember { mutableStateOf("") }
-        var price = remember { mutableStateOf("") }
-        var unit = remember { mutableStateOf("") }
-        var quantity = remember { mutableStateOf("") }
+        val name = remember { mutableStateOf("") }
+        val price = remember { mutableStateOf("") }
+        val unit = remember { mutableStateOf("") }
+        val quantity = remember { mutableStateOf("") }
         var initialName = "Item Name"
-        var initalPrice = "Price"
+        var initialPrice = "Price"
         var initialUnit = "Unit"
         var initialQuantity = "Quantity"
         val regex = "\\d+\\.\\d{1,2}".toRegex()
@@ -54,7 +54,7 @@ fun EditItemScreen(
         if(!editItem.isEmpty()){
             initialName = editItem
             title = "Edit $editItem"
-            initalPrice = viewModel.getPrice(editItem, store).toString()
+            initialPrice = viewModel.getPrice(editItem, store).toString()
             initialUnit = viewModel.getUnit(editItem, store)
             initialQuantity = viewModel.getQuantity(editItem, store).toString()
         }
@@ -95,7 +95,7 @@ fun EditItemScreen(
                     modifier = Modifier.width(120.dp),
                     value = price.value,
                     onValueChange = { price.value = it },
-                    placeholder = {Text(initalPrice)}
+                    placeholder = {Text(initialPrice)}
                 )
                 Spacer(Modifier.width(10.dp))
                 OutlinedTextField(

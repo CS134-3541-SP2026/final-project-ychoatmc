@@ -31,7 +31,7 @@ class StoreViewModel : ViewModel() {
             if(it.name == store) {
                 storeKey = it.id
                 val json = Json.encodeToString(it)
-                context.dataStore.edit { it[key()] = json }
+                context.dataStore.edit {it[key()] = json }
             }
         }
     }

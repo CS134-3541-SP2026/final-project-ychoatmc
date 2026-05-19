@@ -1,11 +1,12 @@
 package com.example.pricecheckshoppinglist.views
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
@@ -22,13 +23,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.pricecheckshoppinglist.viewModels.ItemViewModel
+import com.example.pricecheckshoppinglist.viewModels.StoreViewModel
 
 @Composable
 fun ListScreen(
     viewModel: ItemViewModel,
+    storeViewModel: StoreViewModel,
     modifier: Modifier,
     onBackClick: () -> Unit,
     onEditItemPageClick: (String, String) -> Unit,
@@ -37,8 +41,7 @@ fun ListScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+            .padding(14.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Button(onBackClick,
@@ -49,42 +52,80 @@ fun ListScreen(
             modifier = Modifier.fillMaxWidth(),
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center)
-        Column(modifier = Modifier.weight(.9f)) {
-            if (viewModel.itemCount() != 0)
-                viewModel.allItems.collectAsState().value.forEach {
-                    Row(modifier = Modifier.fillMaxWidth(),
+        Column(modifier = Modifier.weight(.5f)) {
+            if (viewModel.itemCount() != 0) {
+                val otherStores = mutableListOf<String>()
+                if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                            .height(32.dp),
                         verticalAlignment = Alignment.CenterVertically
-                    ){
+                    ) {
+                        Text("", modifier = Modifier.width(415.dp))
+                        storeViewModel.stores.collectAsState().value.forEach {
+                            if (it.name != storeName) {
+                                Text(it.name, modifier = Modifier.width(70.dp),
+                                    textAlign = TextAlign.Right)
+                                otherStores += it.name
+                            }
+                        }
+                    }
+                }
+                viewModel.allItems.collectAsState().value.forEach {
+                    val item = it.name
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                            .height(32.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         var textColor by remember { mutableStateOf(Color.Black) }
                         var isChecked by remember { mutableStateOf(false) }
-                        var quantity = viewModel.getQuantity(it.name, storeName)
-                        if(quantity == 0.0){
+                        val quantity = viewModel.getQuantity(it.name, storeName)
+                        if (quantity == 0.0) {
                             textColor = Color.LightGray
                             isChecked = true
                         }
                         Checkbox(checked = isChecked, onCheckedChange = {
                             isChecked = it
-                            if(isChecked) {
-                                textColor = Color.LightGray
+                            textColor = if (isChecked) {
+                                Color.LightGray
+                            } else {
+                                Color.Black
                             }
-                            else{
-                                textColor = Color.Black
-                            }
-                            })
+                        })
                         TextButton({ onEditItemPageClick(it.name, storeName) }) {
-                            Text(it.name, color = textColor)
+                            Text(
+                                it.name, color = textColor,
+                                modifier = Modifier.width(210.dp)
+                            )
                         }
-                        Text(quantity.toString() + " " +
-                        viewModel.getUnit(it.name, storeName),
+                        Text(
+                            quantity.toString() + " " +
+                                    viewModel.getUnit(it.name, storeName),
                             textAlign = TextAlign.Right,
                             color = textColor,
-                            modifier = Modifier.width(200.dp))
-                        Text(viewModel.getPrice(it.name, storeName).toString(),
+                            modifier = Modifier.width(50.dp)
+                        )
+                        Text(
+                            viewModel.getPrice(it.name, storeName).toString(),
                             textAlign = TextAlign.Right,
                             color = textColor,
-                            modifier = Modifier.width(300.dp))
+                            modifier = Modifier.width(55.dp)
+                        )
+                        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                            otherStores.forEach {
+                                Spacer(modifier = Modifier.width(25.dp))
+                                Text(
+                                    viewModel.getPrice(item, it).toString(),
+                                    textAlign = TextAlign.Right,
+                                    color = textColor,
+                                    modifier = Modifier.width(55.dp)
+                                )
+                            }
+                        }
                     }
                 }
+            }
         }
         Button(onClick = {onEditItemPageClick("", storeName)}) {
             Text("Add New Item")
