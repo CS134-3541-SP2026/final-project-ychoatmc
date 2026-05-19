@@ -1,5 +1,6 @@
 package com.example.pricecheckshoppinglist.views
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,7 +30,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.pricecheckshoppinglist.viewModels.ItemViewModel
 import com.example.pricecheckshoppinglist.viewModels.StoreViewModel
+import java.text.NumberFormat
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun ListScreen(
     viewModel: ItemViewModel,
@@ -38,6 +42,7 @@ fun ListScreen(
     onEditItemPageClick: (String, String) -> Unit,
     storeName: String
 ){
+    var subtotal by remember { mutableDoubleStateOf(0.0) }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -57,7 +62,8 @@ fun ListScreen(
                 val otherStores = mutableListOf<String>()
                 if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     Row(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .height(32.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -74,7 +80,8 @@ fun ListScreen(
                 viewModel.allItems.collectAsState().value.forEach {
                     val item = it.name
                     Row(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .height(32.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -88,8 +95,10 @@ fun ListScreen(
                         Checkbox(checked = isChecked, onCheckedChange = {
                             isChecked = it
                             textColor = if (isChecked) {
+                                subtotal += (viewModel.getPrice(item, storeName) * viewModel.getQuantity(item, storeName))
                                 Color.LightGray
                             } else {
+                                subtotal -= (viewModel.getPrice(item, storeName) * viewModel.getQuantity(item, storeName))
                                 Color.Black
                             }
                         })
@@ -125,6 +134,8 @@ fun ListScreen(
                         }
                     }
                 }
+                //NumberFormat formatter = new DecimalFormat("#,###");
+                Text(String.format("Subtotal: %.2f", subtotal))
             }
         }
         Button(onClick = {onEditItemPageClick("", storeName)}) {
